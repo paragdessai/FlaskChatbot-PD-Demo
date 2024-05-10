@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Bot Application</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .column1,
+    .column2 {
+      height: 30vh;
+    }
+    .column1 {
+      background-color:#f8f9fa;
+    }
+    .column2 {
+      background-color: #f8f9fa;
+      height: 100vh; /* Ensure the column takes full viewport height */
+      overflow-y: auto; /* Enable vertical scrolling */
+    }
+    .container {
+      min-height: 100%; /* Ensure container expands to full height */
+      display: flex;
+      flex-direction: column; /* Stack children vertically */
+    }
+    .chat-container {
+      width: 95%; /* Increase width by 25% */
+      max-width: 800px; /* Adjust as needed */
+      margin: auto; /* Center the chat container */
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #fff; /* Changed background color */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      height: 60%; /* Ensure the chat container takes full height of column */
+      position: relative; /* For absolute positioning */
+      overflow-y: auto; /* Enable vertical scrolling */
+      padding-bottom: 20px; /* Add some padding to the bottom */
+      padding-top:20px;
+    }
+    .chat-bubble {
+      max-width: 70%;
+      margin-bottom: 10px;
+      padding: 10px 15px;
+      border-radius: 20px;
+      position: relative; /* For absolute positioning of image */
+    }
+    .user-bubble {
+      background-color: #007bff;
+      color: #ffffff;
+      float: left;
+      clear: both; /* Ensure each message starts on a new line */
+    }
+    .bot-bubble {
+      background-color: #28a745;
+      color: #ffffff;
+      float: right;
+      clear: both; /* Ensure each message starts on a new line */
+    }
+    .bubble-image {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      position: absolute;
+      bottom: -20px;
+      right: 30px; /* Adjust the position to the right */;
+      transform: translateX(-50%);
+    }
+    .user-image {
+      left: 0;
+    }
+    .bot-image {
+      right: 0;
+      margin-left: 40px; /* Adjust as needed */
+    }
+    .file-input {
+      display: none;
+    }
+    .file-label {
+      color: #007bff;
+      cursor: pointer;
+    }
+    .chat-form {
+      max-width: 800px; /* Same as chat container */
+      margin: auto; /* Center the form */
+      width: 100%; /* Take full width of its container */
+      text-align: center; /* Center align the form */
+      margin-top: 20px; /* Add space between chat container and form */
+    }
+
+    .form-control {
+        width: 100%; /* Adjust the width as needed */
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="#"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"></a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto"> <!-- Use ml-auto class for margin-left: auto -->
+        <li class="nav-item">
+          <a class="nav-link " href="#">
+            <img src="">
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-3 column1">
+      <!-- Table for displaying chat history IDs -->
+      <table class="table">
+        <thead>
+          <tr>
+           <!-- <th>ID</th> -->
+            <th>Recent Chats</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for chat in user_messages %}
+            <tr>
+             <!-- <td>{{ chat.id }}</td> -->
+              <td>{{ chat.user}}</td>
+              <td><a href="/load/{{ chat.id }}" type="button" class="btn btn-dark btn-sm mx-1">show</button></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-9 column2">
+      <div class="chat-container">
+        {% for entry in conversation_history %}
+          {% if entry.user or entry.bot %}
+            {% if entry.user %}
+              <div class="chat-bubble user-bubble">
+                {{ entry.user }}
+              </div>
+            {% endif %}
+            {% if entry.bot %}
+              <div class="chat-bubble bot-bubble">
+                {{ entry.bot }}
+              </div>
+            {% endif %}
+            {% if entry.file %}
+            <div class="chat-bubble bot-bubble">
+              <p>User: <img src="{{ entry.file }}" alt="Uploaded Image"></p>
+            </div>
+          {% endif %}
+
+          {% endif %}
+        {% endfor %}
+      </div>
+      <form action="/" method="post" enctype="multipart/form-data" class="chat-form">
+        <!-- Form for user input -->
+        <input type="hidden" id="session_id" name="session_id" value="{{ session_id }}">
+        <div class="form-outline mb-3">
+          <textarea class="form-control" id="user_input" name="user_input" rows="4"></textarea>
+          <label class="form-label" for="user_input">Type your question here</label>
+        </div>
+        <input type="file" id="file_input" name="file" class="file-input">
+        <label for="file_input" class="file-label"><i class="fas fa-paperclip"></i> Attach File</label>
+        <input type="submit" value="Ask" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
